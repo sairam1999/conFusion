@@ -1,9 +1,9 @@
-export class Promotion {
+export class Leader {
     id: string;
     name: string;
     image: string;
-    label: string;
-    price: string;
+    designation: string;
+    abbr: string;
     featured: boolean;
     description: string;
 }
