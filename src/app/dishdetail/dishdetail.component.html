@@ -40,17 +40,35 @@
     <mat-list fxFlex>
       <div><h2>Comments</h2></div>
         <mat-list-item *ngFor="let comment of dish.comments">
-          <p matLine>
-            {{comment.comment}}
-          </p>
+          <p matLine>{{comment.comment}}</p>
           <p matLine>{{comment.rating}} stars</p>
-          
           <p matLine>--{{comment.author}}{{comment.date | date}}</p>
         </mat-list-item>
+        
       </mat-list>
   </div>
   </div>
-
   
+  <div fxFlex  >
+    <h3>Comment</h3>
 
+    <form novalidate [formGroup]="commentForm" #cform="ngForm" (ngSubmit)="onSubmit()">
+      <p>
+        <mat-form-field class="half-width">
+          <input matInput formControlName="author" placeholder="Name" type="text" required>
+          <mat-error *ngIf="commentErrors.author">{{commentErrors.author}}</mat-error>
+        </mat-form-field>
+      </p>
+      <mat-slider thumbLabel step="1" tickInterval="1" max="5" formControlName="rating">
+</mat-slider>
+      <p>
+        <mat-form-field class="full-width">
+          <textarea matInput formControlName="comment" placeholder="Your Comment" rows=12></textarea>
+          <mat-error *ngIf="commentErrors.comment">{{commentErrors.comment}}</mat-error>
+
+        </mat-form-field>
+      </p>
+      <button type="submit" mat-button class="background-primary text-floral-white">Submit</button>
+    </form>
+  </div>
 </div>
