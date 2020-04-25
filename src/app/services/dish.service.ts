@@ -1,9 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Dish } from '../shared/dish';
 import { DISHES } from '../shared/dishes';
-import { of } from 'rxjs';
+import { of, from } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import {HttpClient,HttpHeaders} from '@angular/common/http';
+import { baseURL} from '../shared/baseurl';
+import { map ,catchError} from 'rxjs/operators';
+import { ProcessHTTPMsgsService } from './process-httpmsgs.service';
+
 
 @Injectable({
   providedIn: 'root'
@@ -11,19 +16,40 @@ import { Observable } from 'rxjs';
 export class DishService {
 
   
-  constructor() { }
+  constructor(private http: HttpClient,
+    private processhttpmsgsservice: ProcessHTTPMsgsService) { }
   getDishes(): Observable<Dish[]> {
-    return of(DISHES).pipe(delay(2000));
+    return this.http.get<Dish[]>(baseURL + 'dishes')
+    .pipe(catchError(this.processhttpmsgsservice.handleError));
+    
   }
 
   getDish(id: number): Observable<Dish> {
-    return of(DISHES.filter((dish) => (dish.id === id))[0]).pipe(delay(2000));
+    return this.http.get<Dish>(baseURL + 'dishes/' + id)
+    .pipe(catchError(this.processhttpmsgsservice.handleError));
+
   }
 
   getFeaturedDish(): Observable<Dish> {
-    return of(DISHES.filter((dish) => dish.featured)[0]).pipe(delay(2000));
+    return this.http.get<Dish[]>(baseURL + 'dishes?featured=true').pipe(map(dishes => dishes[0]))
+    .pipe(catchError(this.processhttpmsgsservice.handleError));
+      
   }
   getDishIds(): Observable<string[] | any> {
-    return of(DISHES.map(dish => dish.id ));
+    return this.getDishes().pipe(map(dishes => dishes.map(dish => dish.id)))
+    .pipe(catchError(error => error));
+ 
+   }
+
+   putDish(dish: Dish): Observable<Dish> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json'
+      })
+    };
+    return this.http.put<Dish>(baseURL + 'dishes/' + dish.id, dish, httpOptions)
+      .pipe(catchError(this.processhttpmsgsservice.handleError));
+
   }
+
 }

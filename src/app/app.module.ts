@@ -33,6 +33,11 @@ import { DishService } from './services/dish.service';
 import { PromotionService} from './services/promotion.service';
 import { LeaderService} from './services/leader.service';
 
+import { HttpClientModule,  } from '@angular/common/http';
+import { from } from 'rxjs';
+import { HttpModule} from '@angular//http';
+import { baseURL } from './shared/baseurl';
+import { HighlightDirective } from './directives/highlight.directive';
 
 @NgModule({
   declarations: [
@@ -44,7 +49,8 @@ import { LeaderService} from './services/leader.service';
     AboutComponent,
     HomeComponent,
     ContactComponent,
-    LoginComponent
+    LoginComponent,
+    HighlightDirective
   ],
   imports: [
     BrowserModule,
@@ -65,13 +71,16 @@ import { LeaderService} from './services/leader.service';
     MatSlideToggleModule,
     MatSliderModule,
     MatProgressSpinnerModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    HttpModule,
+    HttpClientModule
     
   ],
   providers: [
     DishService,
     PromotionService,
-    LeaderService
+    LeaderService,
+    { provide: 'BaseURL' , useValue: baseURL}
   ],
   entryComponents: [
     LoginComponent
