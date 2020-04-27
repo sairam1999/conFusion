@@ -32,7 +32,7 @@ import {MatSliderModule} from '@angular/material/slider';
 import { DishService } from './services/dish.service';
 import { PromotionService} from './services/promotion.service';
 import { LeaderService} from './services/leader.service';
-
+import { FeedbackService} from './services/feedback.service';
 import { HttpClientModule,  } from '@angular/common/http';
 import { from } from 'rxjs';
 import { HttpModule} from '@angular//http';
@@ -80,7 +80,8 @@ import { HighlightDirective } from './directives/highlight.directive';
     DishService,
     PromotionService,
     LeaderService,
-    { provide: 'BaseURL' , useValue: baseURL}
+    { provide: 'BaseURL' , useValue: baseURL},
+    FeedbackService,
   ],
   entryComponents: [
     LoginComponent

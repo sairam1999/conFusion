@@ -1,7 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild,Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Feedback, ContactType } from '../shared/feedback';
-import { flyInOut } from '../animations/app.animations';
+import { flyInOut, expand } from '../animations/app.animations';
+import { FeedbackService} from '../services/feedback.service';
+import { Params, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-contact',
@@ -12,17 +14,26 @@ import { flyInOut } from '../animations/app.animations';
     'style': 'display: block;'
     },
     animations: [
-      flyInOut()
+      flyInOut(),
+      expand()
     ]
 })
 export class ContactComponent implements OnInit {
-  @ViewChild('fform')
+  @ViewChild('fform') 
   feedbackFormDirective;
-
-  feedbackForm: FormGroup;
+ feedbackForm: FormGroup;
   feedback: Feedback;
   contactType = ContactType;
-  constructor(private fb: FormBuilder) {
+  errMess:string;
+  feedbackSubmit = false;
+  confirmFeedback: Feedback;
+  confirmFeedbackDone = false;
+  
+  constructor(private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private location: Location,
+    private feedbackService: FeedbackService,
+    @Inject('BaseURL') public BaseURL) {
     this.createForm();
    }
 
@@ -76,19 +87,42 @@ export class ContactComponent implements OnInit {
   }
 
   onSubmit() {
+    this.feedbackSubmit = true;
     this.feedback = this.feedbackForm.value;
     console.log(this.feedback);
+    // submit data
+    this.feedbackService.submitFeedback(this.feedback)
+      .subscribe(
+        data => {
+          this.feedbackSubmit = false;
+          this.confirmFeedbackDone = true;
+        
+          this.confirmFeedback = data;
+          setTimeout(() => {
+            this.confirmFeedbackDone = false;
+          }, 2000);
+
+          console.log(data);
+        },
+        errmess => {
+          console.log(errmess.error);
+        }
+      );
+
+
     this.feedbackForm.reset({
       firstname: '',
       lastname: '',
-      telnum: '',
+      telnum: 0,
       email: '',
-      agree: false,
-      contacttype: 'None',
-      message: ''
-     });
-     this.feedbackFormDirective.resetForm();
+      agree: ['', Validators.required],
+      contacttype: ['None', Validators.required],
+      message: ['', Validators.required]
+
+    });
+    this.feedbackFormDirective.resetForm();
   }
+
 
    
   onValueChanged(data?: any) {
@@ -96,7 +130,6 @@ export class ContactComponent implements OnInit {
     const form = this.feedbackForm;
     for (const field in this.formErrors) {
       if (this.formErrors.hasOwnProperty(field)) {
-        // clear previous error message (if any)
         this.formErrors[field] = '';
         const control = form.get(field);
         if (control && control.dirty && !control.valid) {

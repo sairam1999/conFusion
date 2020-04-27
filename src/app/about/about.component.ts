@@ -25,8 +25,13 @@ errMess:string;
     @Inject('BaseURL') public BaseURL) { }
 
   ngOnInit(): void {
-    this.leaderService.getLeaders().subscribe(leaders => this.leaders =leaders),
+    this.leaderService
+      .getLeaders()
+      .subscribe(leaders => this.leaders =leaders),
     errmess => this.errMess = <any>errmess;
+
+  
+
     
 
   }
